@@ -791,6 +791,10 @@
   (let ((a1-23 (new 'debug 'debug-menu-item-flag "Eye" cam-eye dm-cam-mode-func)))
     (debug-menu-append-item arg1 a1-23)
     )
+
+      (let ((a1-23 (new 'debug 'debug-menu-item-flag "cam-firstperson" cam-firstperson dm-cam-mode-func)))
+    (debug-menu-append-item arg1 a1-23)
+    )
   (let ((a1-25 (new 'debug 'debug-menu-item-flag "Stick" cam-stick dm-cam-mode-func)))
     (debug-menu-append-item arg1 a1-25)
     )

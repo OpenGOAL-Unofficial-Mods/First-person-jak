@@ -567,6 +567,181 @@
     (none)
     )
   )
+(deftype cam-firstperson-bank (basic)
+  ((rot-speed   float  :offset-assert   4)
+   (max-degrees float  :offset-assert   8)
+   (max-fov     float  :offset-assert  12)
+   (min-fov     float  :offset-assert  16)
+   )
+  :method-count-assert 9
+  :size-assert         #x14
+  :flag-assert         #x900000014
+  )
+ 
+ 
+(define *CAM_firstperson-bank*
+  (new 'static 'cam-firstperson-bank :rot-speed 364.0889 :max-degrees 0.0 :max-fov 11650.845 :min-fov 6189.511)
+  )
+ 
+;; main first-person camera
+;; note: modified for high fps
+(defstate cam-firstperson (camera-slave)
+  :event (behavior ((arg0 process) (arg1 int) (arg2 symbol) (arg3 event-message-block))
+    (case arg2
+      (('teleport)
+       #f
+       )
+      (else
+        (cam-standard-event-handler arg0 arg1 arg2 arg3)
+        )
+      )
+    )
+  :enter (behavior ()
+    (when (not (-> self enter-has-run))
+      (let ((v1-3 (vector-float*! (new-stack-vector0) (-> *camera* local-down) (+ 1024.0 (-> *camera* target-height)))))
+        (vector-! (-> self trans) (-> *camera* tpos-curr) v1-3)
+        )
+      (set! (-> self blend-from-type) (the-as uint 0))
+      (set! (-> self blend-to-type) (the-as uint 0))
+      0
+      )
+    (set! (-> self fov) 11650.845)
+    (none)
+    )
+  :exit (behavior ()
+    (if (and *target*
+             (logtest? (-> *camera* master-options) 2)
+             (logtest? (-> *target* state-flags) (state-flags first-person-mode))
+             )
+        (send-event *target* 'end-mode)
+        )
+    (none)
+    )
+  :trans (behavior ()
+    (if (zero? (logand (-> *camera* master-options) 2))
+        (go cam-free-floating)
+        )
+    (none)
+    )
+  :code (behavior ()
+    (let ((gp-0 (-> *display* base-frame-counter)))
+      (loop
+        (when (not (paused?))
+          (let ((s4-0 (vector-reset! (new-stack-vector0)))
+                (s5-0 (new-stack-matrix0))
+                )
+            (when *camera-read-analog*
+              (let ((f30-0 (analog-input-horizontal-first   ;; changed for pc port
+                             (the-as int (+ (-> *cpad-list* cpads 0 rightx) -256 (-> *cpad-list* cpads 0 leftx)))
+                             (the-as float 0.0)
+                             (the-as float 48.0)
+                             (the-as float 110.0)
+                             (the-as float -1.0)
+                             )
+                           )
+                    (f0-0 (analog-input-vertical-first   ;; changed for pc port
+                            (the-as int (+ (-> *cpad-list* cpads 0 righty) -256 (-> *cpad-list* cpads 0 lefty)))
+                            (the-as float 0.0)
+                            (the-as float 48.0)
+                            (the-as float 110.0)
+                            (the-as float -1.0)
+                            )
+                          )
+                    )
+                (set! (-> s4-0 y) (- (-> s4-0 y) (* (- f30-0) (* (-> *display* time-adjust-ratio) (-> *CAM_firstperson-bank* rot-speed))))) ;; changed for high fps
+                (set! (-> s4-0 x) (- (-> s4-0 x) (* (- f0-0) (* (-> *display* time-adjust-ratio) (-> *CAM_firstperson-bank* rot-speed))))) ;; changed for high fps
+                )
+              )
+            (cond
+              ((< (* (-> *display* time-adjust-ratio) (-> *CAM_firstperson-bank* rot-speed)) (-> s4-0 x)) ;; changed for high fps
+               (set! (-> s4-0 x) (* (-> *display* time-adjust-ratio) (-> *CAM_firstperson-bank* rot-speed))) ;; changed for high fps
+               )
+              ((< (-> s4-0 x) (- (* (-> *display* time-adjust-ratio) (-> *CAM_firstperson-bank* rot-speed)))) ;; changed for high fps
+               (set! (-> s4-0 x) (- (* (-> *display* time-adjust-ratio) (-> *CAM_firstperson-bank* rot-speed)))) ;; changed for high fps
+               )
+              )
+            (cond
+              ((< (* (-> *display* time-adjust-ratio) (-> *CAM_firstperson-bank* rot-speed)) (-> s4-0 y)) ;; changed for high fps
+               (set! (-> s4-0 y) (* (-> *display* time-adjust-ratio) (-> *CAM_firstperson-bank* rot-speed))) ;; changed for high fps
+               )
+              ((< (-> s4-0 y) (- (* (-> *display* time-adjust-ratio) (-> *CAM_firstperson-bank* rot-speed)))) ;; changed for high fps
+               (set! (-> s4-0 y) (- (* (-> *display* time-adjust-ratio) (-> *CAM_firstperson-bank* rot-speed)))) ;; changed for high fps
+               )
+              )
+            (cond
+              ((and (= (-> s4-0 x) 0.0) (= (-> s4-0 y) 0.0))
+               (set! gp-0 (-> *display* base-frame-counter))
+               )
+              (else
+                (let ((v1-44 (min 10 (max 1 (- (-> *display* base-frame-counter) gp-0)))))
+                  (vector-float*! s4-0 s4-0 (* 0.1 (the float v1-44)))
+                  )
+                )
+              )
+            (matrix-axis-angle! s5-0 (-> *camera* local-down) (-> s4-0 y))
+            (matrix*! (the-as matrix (-> self tracking)) (the-as matrix (-> self tracking)) s5-0)
+            (when (zero? (logand (-> self options) 8))
+              (if (< (vector-dot (-> self tracking inv-mat vector 1) (-> *camera* local-down)) 0.0)
+                  (forward-down->inv-matrix
+                    (the-as matrix (-> self tracking))
+                    (-> self tracking inv-mat vector 2)
+                    (-> *camera* local-down)
+                    )
+                  (forward-down->inv-matrix
+                    (the-as matrix (-> self tracking))
+                    (-> self tracking inv-mat vector 2)
+                    (vector-negate! (new-stack-vector0) (-> *camera* local-down))
+                    )
+                  )
+              )
+            (matrix-axis-angle! s5-0 (the-as vector (-> self tracking)) (- (-> s4-0 x)))
+            (matrix*! (the-as matrix (-> self tracking)) (the-as matrix (-> self tracking)) s5-0)
+            )
+          (when (zero? (logand (-> self options) 8))
+            (let ((f30-1 (vector-dot (-> *camera* local-down) (-> self tracking inv-mat vector 2))))
+              (set! (-> (new 'stack-no-clear 'vector) quad) (the-as uint128 0))
+              (when (< (sin (-> *CAM_firstperson-bank* max-degrees)) (fabs f30-1))
+                (vector--float*!
+                  (-> self tracking inv-mat vector 2)
+                  (-> self tracking inv-mat vector 2)
+                  (-> *camera* local-down)
+                  f30-1
+                  )
+                (vector-normalize! (-> self tracking inv-mat vector 2) (cos (-> *CAM_firstperson-bank* max-degrees)))
+                (if (< f30-1 0.0)
+                    (vector--float*!
+                      (-> self tracking inv-mat vector 2)
+                      (-> self tracking inv-mat vector 2)
+                      (-> *camera* local-down)
+                      (sin (-> *CAM_firstperson-bank* max-degrees))
+                      )
+                    (vector+float*!
+                      (-> self tracking inv-mat vector 2)
+                      (-> self tracking inv-mat vector 2)
+                      (-> *camera* local-down)
+                      (sin (-> *CAM_firstperson-bank* max-degrees))
+                      )
+                    )
+                (vector-cross!
+                  (-> self tracking inv-mat vector 1)
+                  (-> self tracking inv-mat vector 2)
+                  (the-as vector (-> self tracking))
+                  )
+                (set! (-> self tracking inv-mat vector 1 w) 0.0)
+                )
+              )
+            )
+          )
+        (let ((v1-76 (vector-float*! (new-stack-vector0) (-> *camera* local-down) (+ 1024.0 (-> *camera* target-height)))))
+          (vector-! (-> self trans) (-> *camera* tpos-curr) v1-76)
+          )
+        (suspend)
+        )
+      )
+    (none)
+    )
+  )
+
 
 (deftype cam-billy-bank (basic)
   ((rot-speed    float  :offset-assert   4)

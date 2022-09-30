@@ -98,6 +98,18 @@
   )
 
 (defun movie? ()
+
+(if  (not (= (-> *target* draw status) (the-as draw-status 2))
+)
+
+(begin
+(send-event *camera* 'change-state cam-firstperson 0)
+(set! (-> *target* draw status) (draw-status hidden))
+)
+)
+
+(if (= (-> *target* next-state name) 'target-swim-stance)
+(send-event *target* 'die))
   "Are we in a movie?"
   (logtest? (-> *kernel-context* prevent-from-run) (process-mask movie))
   )

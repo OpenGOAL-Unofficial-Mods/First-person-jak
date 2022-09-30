@@ -419,6 +419,7 @@
     cam-decel
     cam-endlessfall
     cam-eye
+    cam-firstperson
     cam-fixed
     cam-fixed-read-entity
     cam-free-floating
