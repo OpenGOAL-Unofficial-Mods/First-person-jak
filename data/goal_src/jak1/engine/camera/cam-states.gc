@@ -578,9 +578,9 @@
   :flag-assert         #x900000014
   )
  
- 
+ ;;364
 (define *CAM_firstperson-bank*
-  (new 'static 'cam-firstperson-bank :rot-speed 364.0889 :max-degrees 0.0 :max-fov 11650.845 :min-fov 6189.511)
+  (new 'static 'cam-firstperson-bank :rot-speed 494.0889 :max-degrees 0.0 :max-fov 11650.845 :min-fov 6189.511)
   )
  
 ;; main first-person camera
