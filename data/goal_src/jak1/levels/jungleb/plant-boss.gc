@@ -1432,7 +1432,7 @@
                  )
           (gp-0 0)
           )
-      (send-event *camera* 'change-state cam-lookat 0)
+      (send-event *camera* 'change-state cam-firstperson 0)
       (logior! (-> self skel status) (janim-status inited))
       (ja-channel-push! 2 (seconds 0.1))
       (ja :group! (-> self draw art-group data 18) :num! (identity (ja-aframe f30-1 0)))

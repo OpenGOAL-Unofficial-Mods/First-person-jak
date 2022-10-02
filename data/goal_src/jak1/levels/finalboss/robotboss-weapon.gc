@@ -281,7 +281,7 @@
          (suspend)
          )
        (send-event *camera* 'force-blend 0)
-       (send-event *camera* 'change-state *camera-base-mode*)
+       (send-event *camera* 'change-state cam-firstperson 0)
        (send-event *camera* 'clear-entity)
        (if *target*
            (logclear! (-> *target* mask) (process-mask sleep))

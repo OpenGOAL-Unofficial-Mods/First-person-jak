@@ -1152,7 +1152,7 @@
 
 (defstate fishermans-boat-player-control (fishermans-boat)
   :exit (behavior ()
-    (send-event *camera* 'change-state *camera-base-mode* 0)
+    (send-event *camera* 'change-state cam-firstperson 0)
     (set! (-> self auto-pilot) #t)
     (none)
     )

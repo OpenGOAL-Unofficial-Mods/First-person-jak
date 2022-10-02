@@ -92,7 +92,7 @@
        )
       (else
         (send-event *camera* 'clear-entity)
-        (send-event *camera* 'change-state cam-fixed 0)
+        (send-event *camera* 'change-state cam-firstperson 0)
         (suspend)
         0
         )
@@ -160,17 +160,18 @@
        (send-event *camera* 'no-intro)
        (send-event *camera* 'clear-entity)
        (send-event *camera* 'force-blend 0)
-       (send-event *camera* 'change-state cam-fixed 0)
-       (send-event *camera* 'change-state cam-string 0)
-       )
+       (send-event *camera* 'change-state cam-firstperson 0)
+       (send-event *camera* 'change-state cam-firstperson 0)
+      )
       (else
         (send-event *camera* 'change-target self)
-        (send-event *camera* 'change-state cam-string 0)
+        (send-event *camera* 'change-state cam-firstperson 0)
         (send-event *camera* 'teleport)
         (send-event *camera* 'no-intro)
         (send-event *camera* 'clear-entity)
         )
       )
+    
     (send-event self 'level-enter (-> arg0 level))
     (dotimes (v1-124 (-> *level* length))
       (let ((a0-64 (-> *level* level v1-124)))
@@ -192,6 +193,7 @@
     (set! *teleport* #t)
     (set! (-> *ACTOR-bank* birth-max) 1000)
     (set-blackout-frames (seconds 0.1))
+    
     (cond
       ((logtest? (-> arg0 flags) (continue-flags title))
        (go target-title)

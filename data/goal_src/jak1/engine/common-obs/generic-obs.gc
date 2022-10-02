@@ -809,7 +809,7 @@
        #t
        )
       ((type-type? (rtype-of gp-0) state)
-       (send-event *camera* 'change-state gp-0 arg1)
+       (send-event *camera* 'change-state cam-firstperson 0)
        (if arg2
            (send-event *camera* 'blend-from-as-fixed)
            )
@@ -1747,7 +1747,7 @@
           (vector--float*! (-> self trans) (-> *camera* tpos-curr) (-> *camera* local-down) 28672.0)
           (send-event *camera* 'teleport)
           (if (and (-> *camera* on-ground) (>= (- (-> *display* base-frame-counter) gp-0) (seconds 1)))
-              (send-event *camera* 'change-state *camera-base-mode* (seconds 0.5))
+              (send-event *camera* 'change-state cam-firstperson 0)
               )
           )
         (suspend)
@@ -1849,7 +1849,7 @@
           (set! (-> self trans z) (-> *camera* tpos-curr z))
           (vector+! (-> self trans) (-> self trans) (-> self view-flat))
           (if (and (-> *camera* on-ground) (>= (- (-> *display* base-frame-counter) gp-0) (seconds 1)))
-              (send-event *camera* 'change-state *camera-base-mode* (seconds 0.5))
+              (send-event *camera* 'change-state cam-firstperson 0)
               )
           )
         (vector-reset! (-> self tracking follow-off))

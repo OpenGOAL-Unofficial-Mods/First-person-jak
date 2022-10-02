@@ -2657,7 +2657,7 @@
   (anim-tester-stop)
   (set! *anim-tester* (process-spawn anim-tester :init initialize-anim-tester :from *16k-dead-pool*))
   (set! *camera-orbit-target* *anim-tester*)
-  (send-event *camera* 'change-state cam-orbit 0)
+ (none)
   #f
   )
 

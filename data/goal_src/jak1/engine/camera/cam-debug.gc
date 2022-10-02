@@ -1573,7 +1573,7 @@
 ;; Used lq/sq
 (defun debug-set-camera-pos-rot! ((arg0 vector) (arg1 matrix))
   (when (and *camera* *camera-combiner*)
-    (send-event *camera* 'change-state cam-free-floating 0)
+    (send-event *camera* 'change-state cam-firstperson 0)
     (set! (-> *camera-combiner* trans quad) (-> arg0 quad))
     (let ((a2-0 (-> *camera-combiner* inv-camera-rot))
           (v1-10 (-> arg1 vector 0 quad))
@@ -1586,7 +1586,7 @@
       (set! (-> a2-0 vector 2 quad) a1-2)
       (set! (-> a2-0 vector 3 quad) a3-0)
       )
-    (send-event *camera* 'change-state cam-fixed 0)
+    (send-event *camera* 'change-state cam-firstperson 0)
     )
   arg0
   )

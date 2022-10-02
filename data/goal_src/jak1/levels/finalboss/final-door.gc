@@ -316,7 +316,7 @@
     (none)
     )
   :exit (behavior ()
-    (send-event *camera* 'change-state *camera-base-mode* (seconds 0.2))
+    (send-event *camera* 'change-state cam-firstperson 0)
     (logclear! (-> self state-flags) (state-flags invulnerable grabbed))
     (target-exit)
     (remove-setting! 'allow-progress)

@@ -96,20 +96,49 @@
               )
           )
   )
-
+(define racer? #f)
+(define flutflut? #f)
 (defun movie? ()
+(set! racer? (aif *target* (case (-> it next-state name) (
+                                      ('target-racing
+                                       'target-racing-bounce
+                                       'target-racing-death
+                                       'target-racing-falling
+                                       'target-racing-grab
+                                       'target-racing-hit
+                                       'target-racing-jump
+                                       'target-racing-smack
+                                       'target-racing-start) #t))))
+(set! flutflut? (aif *target* (case (-> it next-state name) (
+                                      ('target-flut-air-attack
+                                       'target-flut-air-attack-hit-ground
+                                       'target-flut-double-jump
+                                       'target-flut-falling
+                                       'target-flut-grab
+                                       'target-flut-hit
+                                       'target-flut-hit-ground
+                                       'target-flut-jump
+                                       'target-flut-running-attack
+                                       'target-flut-stance
+                                       'target-flut-start
+                                       'target-flut-walk) #t))))
 
-(if  (not (= (-> *target* draw status) (the-as draw-status 2))
-)
-
+(if (and (not racer?) (= (-> (-> (-> (the-as (pointer camera-slave) (-> *camera* child))) state) name) 'cam-string))
 (begin
 (send-event *camera* 'change-state cam-firstperson 0)
+))
+
+(if  (not (= (-> *target* draw status) (the-as draw-status 2)))
+
+(begin
+(if (not racer?)
+(send-event *camera* 'change-state cam-firstperson 0)
+)
 (set! (-> *target* draw status) (draw-status hidden))
 )
 )
 
-(if (= (-> *target* next-state name) 'target-swim-stance)
-(send-event *target* 'die))
+
   "Are we in a movie?"
   (logtest? (-> *kernel-context* prevent-from-run) (process-mask movie))
   )
