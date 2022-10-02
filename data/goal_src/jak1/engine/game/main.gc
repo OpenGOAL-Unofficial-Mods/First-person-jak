@@ -129,8 +129,16 @@
                                        'target-swim-walk
                                        'target-swim-down
                                        'target-swim-up
+                                       'target-swim-jump
+                                       'target-swim-jump-jump
+                                       'target-swim-stance
                                        'target-edge-grab
                                        'target-edge-grab-off
+                                       'target-running-attack
+                                       'target-attack
+                                       'target-attack-air
+                                       'target-attack-uppercut
+                                       'target-attack-uppercut-jump
                                 ) #t))))
 
 
