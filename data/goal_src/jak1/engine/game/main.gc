@@ -128,12 +128,18 @@
 (send-event *camera* 'change-state cam-firstperson 0)
 ))
 
+(if(and racer? (= (-> (-> (-> (the-as (pointer camera-slave) (-> *camera* child))) state) name) 'cam-firstperson))
+(begin
+(send-event *camera* 'change-state cam-bike 0)
+)
+)
+
+
+
 (if  (not (= (-> *target* draw status) (the-as draw-status 2)))
 
 (begin
-(if (not racer?)
-(send-event *camera* 'change-state cam-firstperson 0)
-)
+
 (set! (-> *target* draw status) (draw-status hidden))
 )
 )
