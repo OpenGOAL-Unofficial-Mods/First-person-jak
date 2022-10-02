@@ -129,6 +129,8 @@
                                        'target-swim-walk
                                        'target-swim-down
                                        'target-swim-up
+                                       'target-edge-grab
+                                       'target-edge-grab-off
                                 ) #t))))
 
 
