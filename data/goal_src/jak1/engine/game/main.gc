@@ -98,6 +98,7 @@
   )
 (define racer? #f)
 (define flutflut? #f)
+(define swim? #f)
 (defun movie? ()
 (set! racer? (aif *target* (case (-> it next-state name) (
                                       ('target-racing
@@ -123,6 +124,14 @@
                                        'target-flut-start
                                        'target-flut-walk) #t))))
 
+(set! swim? (aif *target* (case (-> it next-state name) (
+                                      ('target-swim-walk
+                                       'target-swim-walk
+                                       'target-swim-down
+                                       'target-swim-up
+                                ) #t))))
+
+
 (if (and (not racer?) (= (-> (-> (-> (the-as (pointer camera-slave) (-> *camera* child))) state) name) 'cam-string))
 (begin
 (send-event *camera* 'change-state cam-firstperson 0)
@@ -136,7 +145,7 @@
 
 
 
-(if  (not (= (-> *target* draw status) (the-as draw-status 2)))
+(if  (and (not (= (-> *target* draw status) (the-as draw-status 2))) (not swim?))
 
 (begin
 
