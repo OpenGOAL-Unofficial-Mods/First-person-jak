@@ -941,7 +941,7 @@
                            )
                      )
                   ;;slide event disabled for first person mode
-                  (send-event *target* 'change-mode 'tube self)
+                  ;;(send-event *target* 'change-mode 'tube self)
                   )
              )
         (go-virtual slide-control-ride)
